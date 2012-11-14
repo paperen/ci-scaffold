@@ -12,6 +12,7 @@ class Scaffold_Models_Module extends CI_Module
 
 	private $_default_models_path = 'models';
 	private $_tables;
+	private $_models_path;
 
 	function __construct() {
 		parent::__construct();
@@ -45,19 +46,31 @@ class Scaffold_Models_Module extends CI_Module
 	}
 
 	/**
-	 * 验证路径是否存在
+	 * 生成文件夹结构
 	 * @param string $path
 	 * @return bool
 	 */
-	private function _valid_path( $path ) {
-		return file_exists( APPPATH . $path );
+	private function _create_path( $path ) {
+		$model_ab_path = dirname( BASEPATH ) . DIRECTORY_SEPARATOR . $path . DIRECTORY_SEPARATOR;
+		if ( !is_dir( $model_ab_path ) ) mkdir( $model_ab_path );
+		$this->_models_path = $model_ab_path;
 	}
 
 	/**
 	 * 生成已选表模型
+	 * @param string $models_path 模型存放路径
 	 * @param array $table_selected 已选的表
+	 * @return array 已生成的表名数组
 	 */
-	private function _generate_models( $table_selected ) {
+	private function _generate_models( $models_path, $table_selected ) {
+
+		$created_models = array();
+
+		// 生成路径
+		$apppath = APPPATH;
+		$subpath = $apppath . $models_path;
+		$this->_create_path( APPPATH . $models_path );
+
 		// 过滤非法的表
 		$table_fileter = array( );
 		foreach ( $table_selected as $table ) {
@@ -66,6 +79,9 @@ class Scaffold_Models_Module extends CI_Module
 		unset( $table_selected );
 
 		$patterns = array(
+			'/\{tablename\}/',
+			'/\{apppath\}/',
+			'/\{subpath\}/',
 			'/\{modelname\}/',
 			'/\{tablename}/',
 			'/\{pk}/',
@@ -73,6 +89,7 @@ class Scaffold_Models_Module extends CI_Module
 		);
 
 		if ( empty( $table_fileter ) ) return FALSE;
+
 		foreach ( $table_fileter as $table ) {
 			// 获取表的所有字段
 			$fields_arr = $this->db->list_fields( $table );
@@ -82,6 +99,9 @@ class Scaffold_Models_Module extends CI_Module
 			$modelname = ucwords( $table );
 			$fields = "'" . implode( "','", $fields_arr ) . "'";
 			$replacement = array(
+				$table,
+				$apppath,
+				$subpath,
 				$modelname,
 				$table,
 				$pk,
@@ -89,9 +109,12 @@ class Scaffold_Models_Module extends CI_Module
 			);
 
 			$string = preg_replace( $patterns, $replacement, $this->_template() );
+
 			// 生成模型文件
-			$this->_write_to_model( $table, $string );
+			if ( $this->_write_to_file( $table, $string ) ) $created_models[] = $table;
 		}
+
+		return $created_models;
 	}
 
 	/**
@@ -99,10 +122,13 @@ class Scaffold_Models_Module extends CI_Module
 	 * @param string $tablename 表名
 	 * @param string $str 字符串
 	 * @return string 模型文件
-	 * @todo
 	 */
-	private function _write_to_model( $tablename, $str ) {
+	private function _write_to_file( $tablename, $str ) {
+		$filename = $this->_models_path . "{$tablename}_model.php";
+		// 文件存在的话不写入
+		if ( file_exists( $filename ) ) return FALSE;
 
+		return file_put_contents( $filename, $str );
 	}
 
 	/**
@@ -119,12 +145,13 @@ class Scaffold_Models_Module extends CI_Module
 
 			if ( empty( $post_data['table_selected'] ) ) throw new Exception( '没有选择任何表' );
 
-			// 检查路径是否正确
-			if ( !$this->_valid_path( $post_data['path'] ) ) throw new Exception( '生成路径不存在' );
-
 			// 生成模型
-			$this->_generate_models( $post_data['table_selected'] );
-			throw new Exception( '生成完成' );
+			$create_models = $this->_generate_models( $post_data['path'], $post_data['table_selected'] );
+
+			if ( empty( $create_models ) ) throw new Exception( '没有生成任何模型' );
+
+			$resutl = '生成完成 已生成模型：' . implode( ',', $create_models );
+			throw new Exception( $resutl );
 		} catch ( Exception $e ) {
 			$data['tip'] = $e->getMessage();
 		}
@@ -134,7 +161,13 @@ class Scaffold_Models_Module extends CI_Module
 		return
 				<<<EOT
 <?php
-
+/**
+ * {tablename}模型
+ * @author
+ * @version 1.0
+ * @package {apppath}
+ * @subpackage {subpath}
+ */
 class {modelname}_model extends MY_model
 {
 	protected \$_table_name = '{tablename}';
