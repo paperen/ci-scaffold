@@ -52,7 +52,10 @@ class Scaffold_Models_Module extends CI_Module
 	 */
 	private function _create_path( $path ) {
 		$model_ab_path = dirname( BASEPATH ) . DIRECTORY_SEPARATOR . $path . DIRECTORY_SEPARATOR;
-		if ( !is_dir( $model_ab_path ) ) mkdir( $model_ab_path );
+		if ( !is_dir( $model_ab_path ) ) mkdir( $model_ab_path, DIR_WRITE_MODE );
+
+		if ( !is_really_writable( $path ) ) throw new Exception( "{$path}路径不可写" );
+
 		$this->_models_path = $model_ab_path;
 	}
 
@@ -64,12 +67,10 @@ class Scaffold_Models_Module extends CI_Module
 	 */
 	private function _generate_models( $models_path, $table_selected ) {
 
-		$created_models = array();
-
-		// 生成路径
 		$apppath = APPPATH;
-		$subpath = $apppath . $models_path;
-		$this->_create_path( APPPATH . $models_path );
+		$subpath = APPPATH . $models_path;
+
+		$created_models = array( );
 
 		// 过滤非法的表
 		$table_fileter = array( );
@@ -124,11 +125,16 @@ class Scaffold_Models_Module extends CI_Module
 	 * @return string 模型文件
 	 */
 	private function _write_to_file( $tablename, $str ) {
+
 		$filename = $this->_models_path . "{$tablename}_model.php";
 		// 文件存在的话不写入
 		if ( file_exists( $filename ) ) return FALSE;
 
-		return file_put_contents( $filename, $str );
+		$handle = fopen( $filename, FOPEN_WRITE_CREATE_DESTRUCTIVE );
+		$len = fwrite( $handle, $str );
+		fclose( $handle );
+
+		return $len;
 	}
 
 	/**
@@ -144,6 +150,9 @@ class Scaffold_Models_Module extends CI_Module
 			if ( empty( $post_data['path'] ) ) throw new Exception( '没有选择任何表' );
 
 			if ( empty( $post_data['table_selected'] ) ) throw new Exception( '没有选择任何表' );
+
+			// 生成路径
+			$this->_create_path( APPPATH . $post_data['path'] );
 
 			// 生成模型
 			$create_models = $this->_generate_models( $post_data['path'], $post_data['table_selected'] );
