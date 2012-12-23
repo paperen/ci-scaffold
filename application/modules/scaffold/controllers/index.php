@@ -354,7 +354,12 @@ EOT;
 			if ( empty( $create_modules ) ) {
 				$result .= '<h3>没有生成任何模块</h3>';
 			} else {
-				$result .= '<h3>生成完成 已生成模块：' . implode( ',', $create_models ) . '</h3>';
+				$link_arr = '';
+				foreach( $create_modules as $module ) {
+					$url = module_url("{$module}/main/index");
+					$link_arr[] .= "<a href=\"{$url}\" target=\"_blank\">{$module}</a>";
+				}
+				$result .= '<h3>生成完成 已生成模块：' . implode( ',', $link_arr ) . '</h3>';
 			}
 
 			throw new Exception( $result );

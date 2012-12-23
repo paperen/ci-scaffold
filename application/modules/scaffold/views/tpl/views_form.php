@@ -16,7 +16,7 @@ return
 			<?php if( isset( \$is_edit ) && \$is_edit ) { ?>
 			<button type="submit" class="btn btn-success"><i class="icon-white icon-ok"></i> <?php echo get_lang('edit'); ?></button>
 			<?php } else { ?>
-			<button type="submit" class="btn"><i class="icon-white icon-ok"></i> <?php echo get_lang('add'); ?></button>
+			<button type="submit" class="btn btn-success"><i class="icon-white icon-ok"></i> <?php echo get_lang('add'); ?></button>
 			<?php } ?>
 		</div>
 	</div>
