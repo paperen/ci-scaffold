@@ -1132,11 +1132,12 @@ class MY_Loader extends CI_Loader {
 	// --------------- Layout extends --------------
 	// @author paperen
 
-	private $layout = 'default';
+	private $layout;
 	private $layout_path = 'layout/';
 
 	public function _ci_layout_ready() {
 		$this->_ci_is_inside_layout = TRUE;
+		$this->layout = config_item('layout');
 	}
 
 	public function set_layout( $layout ) {

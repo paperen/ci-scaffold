@@ -10,3 +10,5 @@ $config['app_name'] = 'ci-scaffold';
 $config['per_page'] = 5;
 // 当前主题
 $config['theme'] = 'default';
+// layout
+$config['layout'] = 'default';
