@@ -5,7 +5,7 @@
  * @package njsystem
  * @subpackage application/libraries
  * @version 0.0
- * @author 梁子恩
+ * @author paperen
  */
 if ( !defined( 'BASEPATH' ) ) exit( 'No direct script access allowed' );
 

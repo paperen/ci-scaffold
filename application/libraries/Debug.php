@@ -2,7 +2,7 @@
 
 /**
  * 调试类
- * @author 梁子恩
+ * @author paperen
  * @version 0.0
  * @package njsystem
  * @subpackage application/libraries
