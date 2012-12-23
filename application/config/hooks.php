@@ -9,7 +9,18 @@
 |	http://codeigniter.com/user_guide/general/hooks.html
 |
 */
-
+$hook['post_controller'][] = array(
+	'class' => 'Debug',
+	'function' => 'profiler',
+	'filename' => 'Debug.php',
+	'filepath' => 'libraries',
+);
+$hook['post_controller'][] = array(
+	'class' => 'MY_Form_validation',
+	'function' => 'create_token',
+	'filename' => 'MY_Form_validation.php',
+	'filepath' => 'libraries',
+);
 
 
 /* End of file hooks.php */

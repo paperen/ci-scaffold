@@ -1,0 +1,25 @@
+.wrapper {
+	margin-top: 60px;
+	min-height: 500px;
+}
+.footer {
+	background-color: #F5F5F5;
+	border-top: 1px solid #E5E5E5;
+	margin-top: 70px;
+	padding: 30px 0;
+	text-align: center;
+}
+.footer p {
+	color: #777777;
+	margin-bottom: 0;
+}
+.footer-links {
+	margin: 10px 0;
+}
+.footer-links li {
+	display: inline;
+	padding: 0 2px;
+}
+.footer-links li:first-child {
+	padding-left: 0;
+}

@@ -183,7 +183,8 @@ class MY_Loader extends CI_Loader {
 			require_once(APPPATH.'core/Module'.EXT);
 		}
 
-		// 如果有继承Module @梁子恩
+		// 如果有继承Module
+		// @author paperen
 		$extend_module = APPPATH . 'core/' . config_item( 'subclass_prefix' ) . 'Module' . EXT;
 		if ( file_exists( $extend_module ) ) require_once( $extend_module );
 		if (!isset($CI->$class_name))
@@ -304,8 +305,7 @@ class MY_Loader extends CI_Loader {
 			$module_class_name = $this->_ci_module_class;
 			array_unshift($model_paths, APPPATH.'modules/'.$this->_ci_module_path.'/');
 			$module_model_name = str_replace( ' ', '_', ucwords( str_replace( '/', ' ', $this->_ci_module_path . ' ' . $model ) ) );
-			// @author 梁子恩
-			//$module_model_name = str_replace( ' ', '_', ucwords( str_replace( '/', ' ', $model ) ) );
+
 			if (isset($CI->$module_class_name->$name))
 			{
 				show_error('The model name you are loading is the name of a resource that is already being used: '.$module_class_name.'.'.$module_model_name);
@@ -343,9 +343,6 @@ class MY_Loader extends CI_Loader {
 				load_class('Model', 'core');
 			}
 
-			// @author 梁子恩
-			// 加载模块模块继承的原始模型
-			$this->_ci_basemodel( $model );
 			require_once($mod_path.'models/'.$path.$model.'.php');
 
 			$model = ucfirst($model);
@@ -371,7 +368,7 @@ class MY_Loader extends CI_Loader {
 		}
 
 		// couldn't find the model
-		show_error('Unable to locate the model you have specified: '.$model);
+		//show_error('Unable to locate the model you have specified: '.$model);
 	}
 
 	// --------------------------------------------------------------------
@@ -1132,26 +1129,32 @@ class MY_Loader extends CI_Loader {
 		return $this->_base_classes;
 	}
 
-	/**
-	 * 加载模块继承的基础模型
-	 * 若果模型名称是user_module_model代表要加载user_model模型
-	 * 模块中模型要继承原始模型的名称必须是 模型名称_module_model 这种形式
-	 * @author 梁子恩
-	 * @param string $base_model
-	 */
-	private function _ci_basemodel( $base_model ) {
-		$module_tag = 'module';
-		$tmp_arr = explode( '_', $base_model );
-		if ( !in_array( $module_tag, $tmp_arr ) ) return;
-		$model_arr = array( );
-		foreach ( $tmp_arr as $str ) {
-			if ( $str == $module_tag ) continue;
-			$model_arr[] = $str;
-		}
-		$model_name = implode( '_', $model_arr );
-		if ( empty( $model_name ) ) return;
-		$this->model( $model_name );
+	// --------------- Layout extends --------------
+	// @author paperen
+
+	private $layout = 'default';
+	private $layout_path = 'layout/';
+
+	public function _ci_layout_ready() {
+		$this->_ci_is_inside_layout = TRUE;
 	}
+
+	public function set_layout( $layout ) {
+		$this->layout = $layout;
+	}
+
+	public function layout( $view, $data = null, $return = false ) {
+		$layout_data['content'] = $this->view( $view, $data, true );
+		$this->_ci_layout_ready();
+		if ( $return ) {
+			$output = $this->view( $this->layout_path . $this->layout, $layout_data, true );
+			return $output;
+		} else {
+			//视图（布局）下的视图
+			$this->view( $this->layout_path . $this->layout, $layout_data, false );
+		}
+	}
+
 }
 
 /* End of file MY_Loader.php */

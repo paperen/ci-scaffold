@@ -18,6 +18,8 @@ class MY_model extends CI_Model
 	protected $_data = array( );
 	// table name
 	protected $_table_name;
+	// rules
+	protected $_rules;
 
 	function __construct() {
 		parent::__construct();
@@ -57,7 +59,16 @@ class MY_model extends CI_Model
 	 * @return array 字段
 	 */
 	public function _fields() {
-		return $this->_fields;
+		return array_keys( $this->_fields );
+	}
+
+	/**
+	 * 获取某个字段的描述
+	 * @param string $key
+	 * @return string
+	 */
+	public function get_field( $key = '' ) {
+		return ( $key && isset( $this->_fields[$key] ) ) ? $this->_fields[$key] : $this->_fields;
 	}
 
 	/**
@@ -163,7 +174,7 @@ class MY_model extends CI_Model
 	 * @param int $pk 主键ID
 	 * @return array 数据
 	 */
-	public function get_one( $pk ) {
+	public function get_by_pk( $pk ) {
 		$query = $this->db->select( implode( ',', $this->_fields() ) )
 				->from( $this->_table_name() )
 				->where( $this->_primary_key(), $pk );
@@ -176,7 +187,7 @@ class MY_model extends CI_Model
 	 * @param int $offset 游标
 	 * @return array 数据
 	 */
-	public function get_all( $limit = 0, $offset = 0 ) {
+	public function all( $limit = 0, $offset = 0 ) {
 		$query = $this->db->select( implode( ',', $this->_fields() ) )
 				->from( $this->_table_name() );
 		if ( $limit ) $query->limit( $limit, $offset );
