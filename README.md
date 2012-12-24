@@ -44,13 +44,24 @@
 * 已经开启了rewrite
 * 请对数据表字段都加上注释（因为生成时需要读取字段的注释）这也是个好习惯
 
-## 如何帮助开发项目搭建起始平台
+## 如何使用
 * 将该压缩包解压后放到www目录下并改名为你的应用
 * 有需要地选择CI版本 若需要降级或者升级需要将system目录替换掉
 * 设置config/database.php中数据库的参数
-* 访问[scaffold](http://localhost/appname/module/scaffold/index "scaffold")
+* 访问 *http://localhost/appname/module/scaffold/index*
 * 勾选要生成的模型与模块然后生成
 
 > 希望有助你的开发
 > 如有问题欢迎提出
 > [paperen](http://iamlze.cn "paperen")
+
+## 例子
+> 将该项目解压到www目录
+> 在本地随便建立一个数据库比如叫test
+> 将test.sql导入 会产生两个新表user与admin_group
+> 访问 *http://localhost/appname/module/scaffold/index* 点击生成
+> 如无意外会生成两个模型（models）与两个模块（modules）分别叫 user与admin_group
+> 分别访问 *http://localhost/appname/module/user/main/index* 与 *http://localhost/appname/module/admin_group/main/index*
+
+
+最后祝圣诞愉快~by paperen
