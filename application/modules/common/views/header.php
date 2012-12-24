@@ -16,12 +16,10 @@
 				<a href="#" class="brand"><?php echo config_item('app_name'); ?></a>
 				<div class="nav-collapse collapse navbar-inverse-collapse">
 					<ul class="nav">
-						<li class="active"><a href="#">Home</a></li>
-						<li><a href="#">Link</a></li>
-						<li><a href="#">Link</a></li>
+						<li class="active"><a href="#">home</a></li>
 					</ul>
 					<form action="" class="navbar-search pull-right">
-					<input type="text" placeholder="Search" class="search-query span2">
+					<input type="text" placeholder="search" class="search-query span2">
 					</form>
 				</div><!-- /.nav-collapse -->
 			</div>

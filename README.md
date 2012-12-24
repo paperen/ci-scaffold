@@ -13,8 +13,7 @@
 * Hooks 允许动态注册
 * Loader 在hex的基础上可以继承CI_Module同时加入layout概念
 * Model 所有模型将会继承MY_Model 包含一些基本的操作方法
-* MY_Module 中通过魔法方法_call实现对CI原生调用模型的写法进行了改进 变为
-* 调用即加载的模式、
+* MY_Module 中通过魔法方法_call实现对CI原生调用模型的写法进行了改进变为调用即加载的模式
 
 ### helpers
 * 增加了app_helper用来放置该应用扩展或者新增的函数
@@ -23,10 +22,11 @@
 * 创建了中文语言包（暂时可以符合大部分描述，当然有必要的话要根据您的应用作出增加或者修改）
 
 ### libraries
-* 增加Debug调试助手类 页面执行完后会在底部输出页面执行参数与SQL
-* Form_validation 表单验证类的扩展 增加令牌的概念
+* Debug调试助手 其实
+* 就是调用了output的profiler 要关闭它只需要将ENVIRONMENT修改为不是development即可
+* Form_validation 表单验证类的扩展 增加令牌的概念 （在development状态下是永远验证成功的）
 * Pagination 分页类改进
-* Querycache 查询缓存
+* Querycache 查询缓存（对于我们来说是透明的，不需要单独调用）主要用来支持查询缓存
 
 ### modules
 * common 公共模块（header、footer、sidebar、messagebox）可以根据实际情况自我增加与修改
@@ -35,6 +35,9 @@
 ### views
 * layout 放置布局视图文件
 
+### theme
+* common公共css目录 放置一些公用的样式表文件
+* default默认主题 通过修改config/app.php中的theme可以实现调用不同的主题（注意引入css时请使用封装好的css函数，js也是）
 
 ## 要注意的地方
 * 此使用的CI版本为2.1.3
