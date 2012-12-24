@@ -56,12 +56,12 @@
 > [paperen](http://iamlze.cn "paperen")
 
 ## 例子
-> 将该项目解压到www目录
-> 在本地随便建立一个数据库比如叫test
-> 将test.sql导入 会产生两个新表user与admin_group
-> 访问 *http://localhost/appname/module/scaffold/index* 点击生成
-> 如无意外会生成两个模型（models）与两个模块（modules）分别叫 user与admin_group
-> 分别访问 *http://localhost/appname/module/user/main/index* 与 *http://localhost/appname/module/admin_group/main/index*
+* 将该项目解压到www目录
+* 在本地随便建立一个数据库比如叫test
+* 将test.sql导入 会产生两个新表user与admin_group
+* 访问 *http://localhost/appname/module/scaffold/index* 点击生成
+* 如无意外会生成两个模型（models）与两个模块（modules）分别叫 user与admin_group
+* 分别访问 *http://localhost/appname/module/user/main/index* 与 *http://localhost/appname/module/admin_group/main/index*
 
 
 最后祝圣诞愉快~by paperen
