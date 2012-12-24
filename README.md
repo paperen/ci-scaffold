@@ -1,6 +1,8 @@
 # ci-scaffold
 > 自己设计的一个基于[codeigniter](http://ellislab.com/codeigniter/user-guide/ "codeigniter")的脚手架，能生成原始模型文件与模块目录，你只需要扩展与完善功能即可，减少编写重复模式的代码
 > 在CI的基础上也做了一些扩展 包括一些开源的扩展与自己编写的扩展
+> 带截图的说明 [ci-scaffold](http://iamlze.cn/post/ci-scaffold "ci-scaffold")
+![生成的模块列表](http://iamlze.cn/file/168)
 
 ## 开源的扩展
 
