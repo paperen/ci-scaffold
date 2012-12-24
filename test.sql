@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- 主机: localhost
--- 生成日期: 2012 年 12 月 24 日 01:37
+-- 生成日期: 2012 年 12 月 24 日 11:51
 -- 服务器版本: 5.5.24
 -- PHP 版本: 5.3.10-1ubuntu3.2
 
@@ -21,12 +21,12 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE IF NOT EXISTS `admin_group` (
-  `group_id` int(11) NOT NULL AUTO_INCREMENT,
-  `group_name` varchar(64) NOT NULL,
-  `group_description` varchar(255) NOT NULL,
-  `created` int(11) NOT NULL DEFAULT '0',
-  `modified` int(11) NOT NULL DEFAULT '0',
-  `status` tinyint(4) NOT NULL DEFAULT '1',
+  `group_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `group_name` varchar(64) NOT NULL COMMENT '管理组名称',
+  `group_description` varchar(255) NOT NULL COMMENT '描述',
+  `created` int(11) NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `modified` int(11) NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态',
   PRIMARY KEY (`group_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户组表' AUTO_INCREMENT=11 ;
 
