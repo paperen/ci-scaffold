@@ -19,7 +19,27 @@ class Welcome extends CI_Controller {
 	 */
 	public function index()
 	{
-		$this->load->view('welcome_message');
+		$this->load->model('user_index');
+		$this->load->model('user_table');
+		
+		$userdata = array(
+			'username' => 'paperen',
+			'email' => 'paperen@gmail.com',
+			'password' => md5(123456),
+		);
+		
+		// 只存放用户名到主表
+		$id = $this->user_index->insert(array('username'=>$userdata['username']));
+		
+		// 具体用户数据插入相关的分表	
+		$userdata['id'] = $id;
+		$this->user_table->dist(TRUE)->insert($userdata);
+		
+		// 按照id查询用户数据
+		$userdata = $this->user_table->dist(TRUE)->get_by_pk($id);
+		print_r($userdata);
+		
+		//$this->load->view('welcome_message');
 	}
 }
 

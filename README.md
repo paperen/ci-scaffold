@@ -1,72 +1,174 @@
-# ci-scaffold
-> 自己设计的一个基于[codeigniter](http://ellislab.com/codeigniter/user-guide/ "codeigniter")的脚手架，能生成原始模型文件与模块目录，你只需要扩展与完善功能即可，减少编写重复模式的代码
-> 在CI的基础上也做了一些扩展 包括一些开源的扩展与自己编写的扩展
-> 带截图的说明 [ci-scaffold](http://iamlze.cn/post/ci-scaffold "ci-scaffold")
-![生成的模块列表](http://iamlze.cn/file/168)
+# 针对CI模型的分库分表扩展
 
-## 开源的扩展
+就CI在对于一些分库分表这块并没有支持而做的扩展
 
-* 前端使用了[bootstrap](http://twitter.github.com/bootstrap/ "bootstrap")
-* 同时对CI扩展了[HMVC](https://github.com/CodeIgniter/HMVC "HMVC")
+涉及以下文件
 
-## 自己加入的功能与概念
+* application/libraries/MY_Profiler.php （仅仅为了支持在调试模式的SQL日志输出而重写了_compile_queries方法）
+* application/core/MY_Model.php
 
-### core
-* Hooks 允许动态注册
-* Loader 在hex的基础上可以继承CI_Module同时加入layout概念
-* Model 所有模型将会继承MY_Model 包含一些基本的操作方法
-* MY_Module 中通过魔法方法_call实现对CI原生调用模型的写法进行了改进变为调用即加载的模式
+---------------------
 
-### helpers
-* 增加了app_helper用来放置该应用扩展或者新增的函数
+## 使用情景描述
 
-### language
-* 创建了中文语言包（暂时可以符合大部分描述，当然有必要的话要根据您的应用作出增加或者修改）
+在一些大型项目中可以会遇到DB将某些会出现大量数据的表拆分到多个表甚至是多个数据库中多个表
 
-### libraries
-* Debug调试助手 其实
-* 就是调用了output的profiler 要关闭它只需要将ENVIRONMENT修改为不是development即可
-* Form_validation 表单验证类的扩展 增加令牌的概念 （在development状态下是永远验证成功的）
-* Pagination 分页类改进
-* Querycache 查询缓存（对于我们来说是透明的，不需要单独调用）主要用来支持查询缓存
+比如：用户数据
 
-### modules
-* common 公共模块（header、footer、sidebar、messagebox）可以根据实际情况自我增加与修改
-* scaffold 脚手架主要部分文件 主要是用来生成模块与模型的 在发布时请去掉
+在单库单表的情况下只使用user表存放数据
+uid——username——email——password
 
-### views
-* layout 放置布局视图文件
+但随着数据量增加后续会采取分表存放数据比如创建多个表，user0,user1,user2,user3，而同时有一个主表记录用户的id与username，user_index作为用户的一个索引
 
-### theme
-* common公共css目录 放置一些公用的样式表文件
-* default默认主题 通过修改config/app.php中的theme可以实现调用不同的主题（注意引入css时请使用封装好的css函数，js也是）
+user_index
+uid——username
+1——paperen
+2——paperen3
+3——paperen4
 
-## 要注意的地方
-* 此使用的CI版本为2.1.3
-* 使用scaffold来生成模型与模块请确保application/models与modules目录的可写入
-* 理论上升级CI不会影响该扩展，只需将system替换即可
-* autoload中默认自动加载的libraries有database、querycache、form_validation；helpers有url、app；config有app
-* 已经开启了rewrite
-* 请对数据表字段都加上注释（因为生成时需要读取字段的注释）这也是个好习惯
+关于这三个用户的详细信息是分散到不同表存储的，如何知道是哪个表，则使用求余的方法
+公式为：uid%4
+通用公式为：id%(分表总数)
 
-## 如何使用
-* 将该压缩包解压后放到www目录下并改名为你的应用
-* 有需要地选择CI版本 若需要降级或者升级需要将system目录替换掉
-* 设置config/database.php中数据库的参数
-* 访问 *http://localhost/appname/module/scaffold/index*
-* 勾选要生成的模型与模块然后生成
+那对于paperen4这个用户他的详细数据是放在3%4=3，也就是user3表里面
 
-> 希望有助你的开发
-> 如有问题欢迎提出
-> [paperen](http://iamlze.cn "paperen")
+## CI扩展分表使用例子
 
-## 例子
-* 将该项目解压到www目录
-* 在本地随便建立一个数据库比如叫test
-* 将test.sql导入 会产生两个新表user与admin_group
-* 访问 *http://localhost/appname/module/scaffold/index* 点击生成
-* 如无意外会生成两个模型（models）与两个模块（modules）分别叫 user与admin_group
-* 分别访问 *http://localhost/appname/module/user/main/index* 与 *http://localhost/appname/module/admin_group/main/index*
+先在本地建立三个数据库，分别是test、user_db0、user_db1，db目录下分别有这三个数据库的SQL，创建数据库后直接分别在各个库执行对应的SQL
+
+### 配置数据库信息
+* application/config/app.php 中的 $config['dist']
+
+	// 分库分表配
+	$config['dist']['user_table'] = array(
+		'0' => array(
+			'hostname' => '数据库地址',
+			'table_count' => 10, // 分表数
+			'username' => '数据库帐号',
+			'password' => '数据库密码',
+			'dbdriver' => 'mysql',
+			'dbprefix' => '',
+			'pconnect' => FALSE,
+			'db_debug' => TRUE,
+			'cache_on' => FALSE,
+			'cachedir' => FALSE,
+			'char_set' => 'utf8',
+			'dbcollat' => 'utf8_general_ci',
+			'swap_pre' => '',
+			'autoinit' => TRUE,
+			'stricton' => FALSE,
+		),
+	);
+
+这个例子演示的是拆分为10个表，table_count这个配置，其他配置跟database.php里面的配置是一样的，按需调整即可
+
+* 建立模型
+user_index.php 与 user_table.php,需要说明的是user_table.php中需要定义两个变量分别是 _dist_table_prefix 与 _dist_config_key
+
+_dist_table_prefix 为分表的表前缀是什么，这里是user_table
+_dist_config_key 为告诉该分表使用的db配置是哪个，这里也是user_table
+_dist_db_prefix 对于分库才有用的，一般来说默认按配置里面填写的数据库名称，不过如果打算数据库是有规律的，比如：user0,user1..之类可以在配置时缺省database参数，而这里设置数据库前缀为user，会自动按规则匹配相应数据库
+
+* 创建控制器测试
+就使用自带的welcome来写点代码测试下
+
+	public function index()
+	{
+		$this->load->model('user_index');
+		$this->load->model('user_table');
+		
+		$userdata = array(
+			'username' => 'paperen',
+			'email' => 'paperen@gmail.com',
+			'password' => md5(123456),
+		);
+		
+		// 只存放用户名到主表
+		$id = $this->user_index->insert(array('username'=>$userdata['username']));
+		
+		// 具体用户数据插入相关的分表	
+		$userdata['id'] = $id;
+		$this->user_table->dist(TRUE)->insert($userdata);
+		
+		// 按照id查询用户数据
+		$userdata = $this->user_table->dist(TRUE)->get_by_pk($id);
+		print_r($userdata);
+		
+		//$this->load->view('welcome_message');
+	}
+	
+然后访问这个方法，会看到底下的SQL日志
+
+	0.0010  	INSERT INTO `user_index` (`username`) VALUES ('paperen') 
+	0.0000  	INSERT INTO `user_table2` (`username`, `email`, `password`, `id`) VALUES ('paperen', 'paperen@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 152) 
+	0.0000  	SELECT `id`, `username`, `email`, `password`
+				FROM (`user_table2`)
+				WHERE `id` =  152
 
 
-最后祝圣诞愉快~by paperen
+## CI扩展分库分表使用例子
+
+同样是使用上面创建的三个数据库作为测试前提
+
+配置增加多一个数据库配置
+
+	// 分库分表配
+	$config['dist']['user_table'] = array(
+		'0' => array(
+			'database' => 'user_db',
+			'hostname' => 'localhost',
+			'table_count' => 10, // 分表数
+			'username' => 'root',
+			'password' => 'root',
+			'dbdriver' => 'mysql',
+			'dbprefix' => '',
+			'pconnect' => FALSE,
+			'db_debug' => TRUE,
+			'cache_on' => FALSE,
+			'cachedir' => FALSE,
+			'char_set' => 'utf8',
+			'dbcollat' => 'utf8_general_ci',
+			'swap_pre' => '',
+			'autoinit' => TRUE,
+			'stricton' => FALSE,
+		),
+		'1' => array(
+			'database' => 'user_db0',
+			'hostname' => 'localhost',
+			'table_count' => 10, // 分表数
+			'username' => 'root',
+			'password' => 'root',
+			'dbdriver' => 'mysql',
+			'dbprefix' => '',
+			'pconnect' => FALSE,
+			'db_debug' => TRUE,
+			'cache_on' => FALSE,
+			'cachedir' => FALSE,
+			'char_set' => 'utf8',
+			'dbcollat' => 'utf8_general_ci',
+			'swap_pre' => '',
+			'autoinit' => TRUE,
+			'stricton' => FALSE,
+		),
+	);
+	
+其他一切不变，再次访问welcome控制器,查看SQL日志
+
+  数据库:  test   查询: 1  (隐藏)
+	0.0000  	INSERT INTO `user_index` (`username`) VALUES ('paperen') 
+  数据库:  user_db0   查询: 1  (隐藏)
+	0.0020  	INSERT INTO `user_table5` (`username`, `email`, `password`, `id`) VALUES ('paperen', 'paperen@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 5) 
+  数据库:  user_db0   查询: 1  (隐藏)
+	0.0010  	SELECT `id`, `username`, `email`, `password`
+				FROM (`user_table5`)
+				WHERE `id` =  5 
+				
+
+可以使用扩展后那种操作模型的简易方法来写以上代码
+
+	$id = $this->model_user_index_insert(array('username'=>$userdata['username']));
+	
+	$userdata['id'] = $id;
+	$this->model_user_table_dist(TRUE)->insert($userdata);
+
+	print_r($this->model_user_table_dist(TRUE)->get_by_pk($id));	

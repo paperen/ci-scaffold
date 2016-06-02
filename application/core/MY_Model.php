@@ -121,7 +121,7 @@ class MY_model extends CI_Model
 	 */
 	public function insert( $data ) {
 		if ( empty( $data ) ) return FALSE;
-		if ( $this->_is_dist ) {;
+		if ( $this->_is_dist ) {
 			$pk = $this->_primary_key();
 			if ( isset($data[$pk]) ) $this->_dist_init($data[$pk]);
 		}
@@ -216,7 +216,7 @@ class MY_model extends CI_Model
 		return $this->db->count_all_results( $this->_table_name() );
 	}
 
-	private $_is_dist = FALSE;
+	protected $_is_dist = FALSE;
 
 	/**
 	 * 分表表名前缀
@@ -259,8 +259,9 @@ class MY_model extends CI_Model
 		$db_count = count($config);
 		$db_index = $key%$db_count;
 		$db_config = $config[$db_index];
-		if ( $db_count > 1 && $this->_dist_db_prefix ) {
-			$db_config['database'] = "{$this->_dist_db_prefix}{$db_index}";
+		if ( $db_count > 1 ) {
+			// if database is empty set it like '{db_prefix}{index}'
+			$db_config['database'] = ($db_config['database']) ? $db_config['database'] : "{$this->_dist_db_prefix}{$db_index}";
 			$this->db = $this->_CI->load->database($db_config, TRUE);
 			$this->_CI->db_ex[] = $this->db;
 		}
