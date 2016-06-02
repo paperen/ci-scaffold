@@ -21,8 +21,11 @@ class MY_model extends CI_Model
 	// rules
 	protected $_rules;
 
+	protected $_CI;
+
 	function __construct() {
 		parent::__construct();
+		$this->_CI =& get_instance();
 	}
 
 	/**
@@ -89,7 +92,7 @@ class MY_model extends CI_Model
 		$filter_data = array( );
 		$fields = $this->_fields();
 		foreach ( $data as $k => $v ) {
-			if ( $is_pk && $this->_primary_key() == $k ) continue;
+			if ( $is_pk && $this->_primary_key() == $k && !$this->_is_dist ) continue;
 			if ( !in_array( $k, $fields ) ) continue;
 			$filter_data[$k] = $v;
 		}
@@ -118,6 +121,10 @@ class MY_model extends CI_Model
 	 */
 	public function insert( $data ) {
 		if ( empty( $data ) ) return FALSE;
+		if ( $this->_is_dist ) {;
+			$pk = $this->_primary_key();
+			if ( isset($data[$pk]) ) $this->_dist_init($data[$pk]);
+		}
 		$this->_set_data( $this->_filter_data( $data ) );
 		$this->db->insert( $this->_table_name(), $this->_get_data() );
 		$this->_clear_data();
@@ -131,6 +138,8 @@ class MY_model extends CI_Model
 	 */
 	public function insert_batch( $data ) {
 		if ( empty( $data ) ) return FALSE;
+		// not support insert batch
+		if ( $this->_is_dist ) return FALSE;
 
 		// @todo more pretty
 		foreach ( $data as $single )
@@ -152,6 +161,7 @@ class MY_model extends CI_Model
 
 		if ( !isset( $data[$pk] ) ) return FALSE;
 		$pk_value = $data[$pk];
+		if ( $this->_is_dist ) $this->_dist_init($data[$pk]);
 
 		$this->_set_data( $this->_filter_data( $data, TRUE ) );
 		$this->db->where( $pk, $pk_value )->update( $this->_table_name(), $this->_get_data() );
@@ -165,6 +175,7 @@ class MY_model extends CI_Model
 	 * @return int 影响行数
 	 */
 	public function delete( $pk ) {
+		if ( $this->_is_dist ) $this->_dist_init($pk);
 		$this->db->where( $this->_primary_key(), $pk )->delete( $this->_table_name() );
 		$this->db->affected_rows();
 	}
@@ -175,6 +186,7 @@ class MY_model extends CI_Model
 	 * @return array 数据
 	 */
 	public function get_by_pk( $pk ) {
+		if ( $this->_is_dist ) $this->_dist_init($pk);
 		$query = $this->db->select( implode( ',', $this->_fields() ) )
 				->from( $this->_table_name() )
 				->where( $this->_primary_key(), $pk );
@@ -188,6 +200,8 @@ class MY_model extends CI_Model
 	 * @return array 数据
 	 */
 	public function all( $limit = 0, $offset = 0 ) {
+		// not support select all
+		if ( $this->_is_dist ) return FALSE;
 		$query = $this->db->select( implode( ',', $this->_fields() ) )
 				->from( $this->_table_name() );
 		if ( $limit ) $query->limit( $limit, $offset );
@@ -202,4 +216,60 @@ class MY_model extends CI_Model
 		return $this->db->count_all_results( $this->_table_name() );
 	}
 
+	private $_is_dist = FALSE;
+
+	/**
+	 * 分表表名前缀
+	 * @param string
+	 */
+	protected $_dist_table_prefix;
+
+	/**
+	 * 分库库名前缀
+	 * @param string
+	 */
+	protected $_dist_db_prefix;
+
+	/**
+	 * 分表配置
+	 * @param string
+	 */
+	protected $_dist_config;
+
+	/**
+	 * 分表配置键值
+	 * @param string
+	 */
+	protected $_dist_config_key;
+
+	/**
+	 * 标记为分表分库操作
+	 */
+	public function dist($bool = FALSE) {
+		$this->_is_dist = $bool;
+		return $this;
+	}
+
+	protected function _dist_init($key) {
+		if ( empty($this->_dist_config) ) $this->_dist_config = config_item('dist');
+		$config = isset($this->_dist_config[$this->_dist_config_key]) ? $this->_dist_config[$this->_dist_config_key] : NULL;
+		if ( empty($config) ) exit("read dist config failed.[{$this->_dist_config_key}]");
+
+		// db count
+		$db_count = count($config);
+		$db_index = $key%$db_count;
+		$db_config = $config[$db_index];
+		if ( $db_count > 1 && $this->_dist_db_prefix ) {
+			$db_config['database'] = "{$this->_dist_db_prefix}{$db_index}";
+			$this->db = $this->_CI->load->database($db_config, TRUE);
+			$this->_CI->db_ex[] = $this->db;
+		}
+
+		// table count
+		$table_count = $db_config['table_count'];
+		$table_index = $key%$table_count;
+		$table_name = "{$this->_dist_table_prefix}{$table_index}";
+
+		$this->_table_name = $table_name;
+	}
 }
