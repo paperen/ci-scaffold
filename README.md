@@ -156,11 +156,11 @@ user_index.php 与 user_table.php,需要说明的是user_table.php中需要定�
 	
 其他一切不变，再次访问welcome控制器,查看SQL日志
 
-  数据库:  test   查询: 1  (隐藏)
+	数据库:  test   查询: 1  (隐藏)
 	0.0000  	INSERT INTO `user_index` (`username`) VALUES ('paperen') 
-  数据库:  user_db0   查询: 1  (隐藏)
+	数据库:  user_db0   查询: 1  (隐藏)
 	0.0020  	INSERT INTO `user_table5` (`username`, `email`, `password`, `id`) VALUES ('paperen', 'paperen@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 5) 
-  数据库:  user_db0   查询: 1  (隐藏)
+	数据库:  user_db0   查询: 1  (隐藏)
 	0.0010  	SELECT `id`, `username`, `email`, `password`
 				FROM (`user_table5`)
 				WHERE `id` =  5 
