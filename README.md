@@ -16,15 +16,15 @@
 比如：用户数据
 
 在单库单表的情况下只使用user表存放数据
-uid——username——email——password
 
-但随着数据量增加后续会采取分表存放数据比如创建多个表，user0,user1,user2,user3，而同时有一个主表记录用户的id与username，user_index作为用户的一个索引
+	uid——username——email——password
 
-user_index
-uid——username
-1——paperen
-2——paperen3
-3——paperen4
+但随着数据量增加后续会采取分表存放数据比如创建多个表，user0,user1,user2,user3，而同时有一个主表user_index记录用户的id与username，user_index作为用户的一个索引
+
+	uid——username
+	1——paperen
+	2——paperen3
+	3——paperen4
 
 关于这三个用户的详细信息是分散到不同表存储的，如何知道是哪个表，则使用求余的方法
 公式为：uid%4
@@ -63,11 +63,12 @@ uid——username
 这个例子演示的是拆分为10个表，table_count这个配置，其他配置跟database.php里面的配置是一样的，按需调整即可
 
 * 建立模型
+
 user_index.php 与 user_table.php,需要说明的是user_table.php中需要定义两个变量分别是 _dist_table_prefix 与 _dist_config_key
 
-_dist_table_prefix 为分表的表前缀是什么，这里是user_table
-_dist_config_key 为告诉该分表使用的db配置是哪个，这里也是user_table
-_dist_db_prefix 对于分库才有用的，一般来说默认按配置里面填写的数据库名称，不过如果打算数据库是有规律的，比如：user0,user1..之类可以在配置时缺省database参数，而这里设置数据库前缀为user，会自动按规则匹配相应数据库
+*_dist_table_prefix* 为分表的表前缀是什么，这里是user_table
+*_dist_config_key* 为告诉该分表使用的db配置是哪个，这里也是user_table
+*_dist_db_prefix* 对于分库才有用的，一般来说默认按配置里面填写的数据库名称，不过如果打算数据库是有规律的，比如：user0,user1..之类可以在配置时缺省database参数，而这里设置数据库前缀为user，会自动按规则匹配相应数据库
 
 * 创建控制器测试
 就使用自带的welcome来写点代码测试下
