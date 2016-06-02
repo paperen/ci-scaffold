@@ -71,6 +71,7 @@ user_index.php 与 user_table.php,需要说明的是user_table.php中需要定�
 *_dist_db_prefix* 对于分库才有用的，一般来说默认按配置里面填写的数据库名称，不过如果打算数据库是有规律的，比如：user0,user1..之类可以在配置时缺省database参数，而这里设置数据库前缀为user，会自动按规则匹配相应数据库
 
 * 创建控制器测试
+
 就使用自带的welcome来写点代码测试下
 
 	public function index()
