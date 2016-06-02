@@ -70,3 +70,12 @@
 
 
 最后祝圣诞愉快~by paperen
+
+
+---------------------------
+2016-06-02
+
+两个分支
+
+* [分表分库扩展](https://github.com/paperen/ci-scaffold/tree/dist "分表分库扩展")
+* [支持redis](https://github.com/paperen/ci-scaffold/tree/redis "支持redis")
