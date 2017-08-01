@@ -49,9 +49,13 @@ class Scaffold_Index_Module extends CI_Module
 	 * @return array
 	 */
 	private function _post_data() {
+		$model_path = $this->input->post( 'model_path' );
+		$module_path = $this->input->post( 'module_path' );
+		if ( empty( $model_path ) ) $model_path = 'models';
+		if ( empty( $module_path ) ) $module_path = 'modules';
 		return array(
-			'model_path' => $this->input->post( 'model_path' ),
-			'module_path' => $this->input->post( 'module_path' ),
+			'model_path' => $model_path,
+			'module_path' => $module_path,
 			'table_selected' => $this->input->post( 'tables' ),
 		);
 	}
@@ -362,10 +366,32 @@ EOT;
 				$result .= '<h3>生成完成 已生成模块：' . implode( ',', $link_arr ) . '</h3>';
 			}
 
+			$this->_generate_menu($create_modules);
+
 			throw new Exception( $result );
 		} catch ( Exception $e ) {
 			$data['tip'] = $e->getMessage();
 		}
+	}
+
+	/**
+	 * 生成菜单
+	 * @param array $create_modules 生成的模块
+	 */
+	private function _generate_menu($create_modules) {
+		if ( empty( $create_modules ) ) return FALSE;
+
+		// 生成菜单
+		$menu = "<!--menu-->\n";
+		foreach( $create_modules as $module ) {
+			$link = module_url("{$module}/main/index");
+			$menu .= "<li><a href=\"{$link}\"><i class=\"glyphicon\"></i><span class=\"hidden-xs\">&nbsp;&nbsp;{$module}</span></a></li>\n";
+		}
+		$menu_view_file = $this->_module_path . DIRECTORY_SEPARATOR . 'common' . DIRECTORY_SEPARATOR . "views/sidebar.php";
+		$content = file_get_contents($menu_view_file);
+		$content = str_replace('<!--menu-->', $menu, $content);
+
+		file_put_contents($menu_view_file, $content);
 	}
 
 	private function _model_template() {

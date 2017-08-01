@@ -1,6 +1,5 @@
 </div>
-	</div>
-	<footer class="footer">
+<footer class="footer">
 		<div class="container">
 			<p>Designed and built with all the love in the world by <a target="_blank" href="http://twitter.com/mdo">@mdo</a> and <a target="_blank" href="http://twitter.com/fat">@fat</a>.</p>
 			<p>Code licensed under <a target="_blank" href="http://www.apache.org/licenses/LICENSE-2.0">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
@@ -14,5 +13,7 @@
 			</ul>
 		</div>
 	</footer>
+<?php echo js( base_url( 'js/jquery-1.10.2.js' ) ); ?>
+<?php echo js( base_url( 'js/bootstrap/js/bootstrap.min.js' ) ); ?>
 </body>
 </html>

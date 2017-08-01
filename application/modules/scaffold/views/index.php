@@ -14,10 +14,10 @@
 	<?php } ?>
 	<form method="post">
 		<p>
-			<label>模型存放路径(models) <?php echo $app_path; ?><input type="text" name="model_path" value="<?php echo isset( $post_data['model_path'] ) ? $post_data['model_path'] : $model_path; ?>"></label> <i>建议保持默认</i>
+			<label>模型存放路径(models) <?php echo $app_path; ?><input type="text" name="model_path" value="models" readonly></label> <i>建议保持默认</i>
 		</p>
 		<p>
-			<label>模块存放路径(modules) <?php echo $app_path; ?><input type="text" name="module_path" value="<?php echo isset( $post_data['module_path'] ) ? $post_data['module_path'] : $module_path; ?>"></label> <i>建议保持默认</i>
+			<label>模块存放路径(modules) <?php echo $app_path; ?><input type="text" name="module_path" value="modules" readonly></label> <i>建议保持默认</i>
 		</p>
 		<p>选择需要生成模块与模型</p>
 		<?php foreach( $tables_data as $table ) { ?>
